@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS Albums (
 CREATE TABLE IF NOT EXISTS Trek (
     id SERIAL PRIMARY KEY,
     title VARCHAR(60) NOT NULL,
-    duration TIME NOT NULL,
-    CHECK (duration <= '00:10:00' and duration >= '00:01:00'),
+    duration INTEGER NOT NULL,
+    CHECK (duration >= 60 and duration <= 600),
     Albums_id INTEGER REFERENCES Albums(id)
 );
 
@@ -40,12 +40,11 @@ CREATE TABLE IF NOT EXISTS Collections (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     release DATE NOT NULL,
-    CHECK (release >= '2010-01-01'),
-    trek_id INTEGER REFERENCES Trek(id)
+    CHECK (release >= '2010-01-01')
 );
 
-CREATE TABLE IF NOT EXISTS AlbumsTreks (
-    Albums_id INTEGER REFERENCES Albums(id),
+CREATE TABLE IF NOT EXISTS CollectionsTreks (
+    Collections_id INTEGER REFERENCES Collections(id),
     Trek_id INTEGER REFERENCES Trek(id),
-    CONSTRAINT ab PRIMARY KEY (Albums_id, Trek_id)
+    CONSTRAINT ac PRIMARY KEY (Collections_id, Trek_id)
 );
