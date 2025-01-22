@@ -1,0 +1,70 @@
+Название и продолжительность самого длительного трека.
+
+SELECT title, duration
+FROM trek
+ORDER BY duration DESC
+LIMIT 1;
+
+Название треков, продолжительность которых не менее 3,5 минут.
+
+SELECT name
+FROM collections
+WHERE release BETWEEN '2018-01-01' AND '2020-12-31'
+
+Названия сборников, вышедших в период с 2018 по 2020 год включительно.
+
+SELECT title
+FROM trek
+WHERE duration >= 210;
+
+Исполнители, чьё имя состоит из одного слова.
+
+SELECT name
+FROM artists
+WHERE name NOT LIKE '% %';
+
+Название треков, которые содержат слово «мой» или «my».
+
+SELECT title
+FROM trek
+WHERE title LIKE '%Моя%'
+
+Количество исполнителей в каждом жанре
+
+SELECT g.name AS genre, COUNT(ag.Artists_id) AS artist_count
+FROM Genre g
+LEFT JOIN Artistsgenres ag ON g.id = ag.Genre_id
+GROUP BY g.name;
+
+Количество треков, вошедших в альбомы 2019–2020 годов.
+
+SELECT COUNT(DISTINCT t.id) AS TrekCount
+FROM Trek t
+JOIN CollectionsTreks ct ON t.id = ct.Trek_id
+JOIN Collections c ON ct.Collections_id = c.id
+WHERE c.release BETWEEN '2019-01-01' AND '2020-12-31';
+
+Средняя продолжительность треков по каждому альбому.
+
+SELECT albums_id, AVG(duration) FROM trek
+GROUP BY albums_id;
+
+Все исполнители, которые не выпустили альбомы в 2020 году.
+
+SELECT name
+FROM artists
+WHERE id in
+	(SELECT id
+	 FROM albums
+	 WHERE release NOT BETWEEN '2020-01-01' AND '2020-12-30'
+);
+
+Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами)
+
+SELECT name
+FROM collections
+WHERE id IN
+	(SELECT id
+	 FROM artists
+	 WHERE name LIKE '%Киркоров%'
+);
