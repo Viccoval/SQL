@@ -5,13 +5,13 @@ FROM trek
 ORDER BY duration DESC
 LIMIT 1;
 
-Название треков, продолжительность которых не менее 3,5 минут.
+Названия сборников, вышедших в период с 2018 по 2020 год включительно.
 
 SELECT name
 FROM collections
 WHERE release BETWEEN '2018-01-01' AND '2020-12-31'
 
-Названия сборников, вышедших в период с 2018 по 2020 год включительно.
+Название треков, продолжительность которых не менее 3,5 минут.
 
 SELECT title
 FROM trek
@@ -27,7 +27,7 @@ WHERE name NOT LIKE '% %';
 
 SELECT title
 FROM trek
-WHERE title LIKE '%Моя%'
+WHERE string_to_array(LOWER(title),' ')&&ARRAY['my','моя']
 
 Количество исполнителей в каждом жанре
 
@@ -38,11 +38,10 @@ GROUP BY g.name;
 
 Количество треков, вошедших в альбомы 2019–2020 годов.
 
-SELECT COUNT(DISTINCT t.id) AS TrekCount
-FROM Trek t
-JOIN CollectionsTreks ct ON t.id = ct.Trek_id
-JOIN Collections c ON ct.Collections_id = c.id
-WHERE c.release BETWEEN '2019-01-01' AND '2020-12-31';
+SELECT COUNT(*)
+FROM Trek
+JOIN Albums ON Trek.Albums_id = Albums.id
+WHERE Albums.release BETWEEN '2019-01-01' AND '2020-12-31';
 
 Средняя продолжительность треков по каждому альбому.
 
@@ -51,20 +50,23 @@ GROUP BY albums_id;
 
 Все исполнители, которые не выпустили альбомы в 2020 году.
 
-SELECT name
+SELECT artists.name
 FROM artists
-WHERE id in
-	(SELECT id
-	 FROM albums
-	 WHERE release NOT BETWEEN '2020-01-01' AND '2020-12-30'
+WHERE artists.name NOT IN(
+	SELECT artists.name
+	FROM artists
+	JOIN artistsalbums ON artists.id = artistsalbums.artists_id
+	JOIN albums ON artistsalbums.albums_id = albums.id
+	WHERE albums.release BETWEEN '2020-01-01' AND '2020-12-30'
 );
 
-Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами)
+Названия сборников, в которых присутствует конкретный исполнитель
 
-SELECT name
+SELECT DISTINCT collections.name
 FROM collections
-WHERE id IN
-	(SELECT id
-	 FROM artists
-	 WHERE name LIKE '%Киркоров%'
-);
+JOIN collectionstreks ON collections.id = collectionstreks.collections_id
+JOIN trek ON collectionstreks.trek_id = trek.id
+JOIN albums ON trek.albums_id = albums.id
+JOIN artistsalbums ON albums.id = artistsalbums.albums_id
+JOIN artists ON artistsalbums.artists_id = artists.id
+WHERE artists.name = 'Киркоров';
